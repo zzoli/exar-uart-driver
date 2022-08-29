@@ -636,14 +636,14 @@ static int xr21v141x_tty_write(struct tty_struct *tty,
 	return count;
 }
 
-static int xr21v141x_tty_write_room(struct tty_struct *tty)
+static unsigned int xr21v141x_tty_write_room(struct tty_struct *tty)
 {
 	struct xr21v141x *xr21v141x = tty->driver_data;
 	
 	return xr21v141x_wb_is_avail(xr21v141x) ? xr21v141x->writesize : 0;
 }
 
-static int xr21v141x_tty_chars_in_buffer(struct tty_struct *tty)
+static unsigned int xr21v141x_tty_chars_in_buffer(struct tty_struct *tty)
 {
 	struct xr21v141x *xr21v141x = tty->driver_data;
 	/*
@@ -1852,7 +1852,7 @@ static const struct tty_operations xr21v141x_ops = {
 static int __init xr21v141x_init(void)
 {
 	int retval;
-	xr21v141x_tty_driver = alloc_tty_driver(XR21V141X_TTY_MINORS);
+	xr21v141x_tty_driver = tty_alloc_driver(XR21V141X_TTY_MINORS, 0);
 	if (!xr21v141x_tty_driver) {
 		printk(KERN_INFO KBUILD_MODNAME ": alloc_tty_driver(%d) failed\n", XR21V141X_TTY_MINORS);
 		return -ENOMEM;
@@ -1872,7 +1872,8 @@ static int __init xr21v141x_init(void)
 	retval = tty_register_driver(xr21v141x_tty_driver);
 	if (retval) {
 		printk(KERN_INFO KBUILD_MODNAME ": tty_register_driver failed\n");
-		put_tty_driver(xr21v141x_tty_driver);
+		//put_tty_driver(xr21v141x_tty_driver);
+		tty_driver_kref_put(xr21v141x_tty_driver);
 		return retval;
 	}
 
@@ -1880,7 +1881,8 @@ static int __init xr21v141x_init(void)
 	if (retval) {
 		printk(KERN_INFO KBUILD_MODNAME ": usb_register failed\n");
 		tty_unregister_driver(xr21v141x_tty_driver);
-		put_tty_driver(xr21v141x_tty_driver);
+		//put_tty_driver(xr21v141x_tty_driver);
+		tty_driver_kref_put(xr21v141x_tty_driver);
 		return retval;
 	}
 
@@ -1893,7 +1895,7 @@ static void __exit xr21v141x_exit(void)
 {
 	usb_deregister(&xr21v141x_driver);
 	tty_unregister_driver(xr21v141x_tty_driver);
-	put_tty_driver(xr21v141x_tty_driver);
+	tty_driver_kref_put(xr21v141x_tty_driver);
 }
 
 module_init(xr21v141x_init);
