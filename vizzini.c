@@ -1062,7 +1062,7 @@ static int vizzini_set_baud_rate(struct xr21v141x *xr21v141x, unsigned int rate)
 
 
 static void xr21v141x_tty_set_termios(struct tty_struct *tty,
-						struct ktermios *termios_old)
+						const struct ktermios *termios_old)
 {
 	struct xr21v141x *xr21v141x = tty->driver_data;
 	unsigned int             cflag, block;
