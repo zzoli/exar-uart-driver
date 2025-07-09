@@ -584,8 +584,8 @@ static void xr21v141x_tty_close(struct tty_struct *tty, struct file *filp)
 	tty_port_close(&xr21v141x->port, tty, filp);
 }
 
-static int xr21v141x_tty_write(struct tty_struct *tty,
-					const unsigned char *buf, int count)
+static ssize_t xr21v141x_tty_write(struct tty_struct *tty,
+                                   const u8 *buf, size_t count)
 {
 	struct xr21v141x *xr21v141x = tty->driver_data;
 	int stat;
